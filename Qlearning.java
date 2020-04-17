@@ -1,7 +1,7 @@
 
 public class Qlearning {
     public Qlearning(Racecar racecar, char[][] course){
-        //enumerate all state action pair
+        //enumerate all state action pair -> need a state class ? 
         //initialize Qtable randomly
 
         //repeat this until ...
