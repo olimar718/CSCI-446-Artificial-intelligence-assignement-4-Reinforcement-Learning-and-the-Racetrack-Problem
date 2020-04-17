@@ -25,13 +25,6 @@ public class ReadFile {
             System.err.println(e);
         }
         
-        //print course
-        for (int i = 0; i < course.length; i++) {
-            for (int j = 0; j < course[i].length; j++) {
-                System.out.print(course[i][j]);
-            }
-            System.out.println("");
-        }
     }
 
     char[][] getCourse(){
