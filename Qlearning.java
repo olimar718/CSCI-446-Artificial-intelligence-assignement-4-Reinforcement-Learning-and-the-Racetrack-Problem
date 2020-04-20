@@ -1,9 +1,14 @@
 import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Random;
 
 public class Qlearning {
-    public Qlearning(Racecar racecar, char[][] course) {
+    double discountFactor;
+    double learningRate;
+    ArrayList<Double> qtableValues = new ArrayList<>();
+    ArrayList<StateActionPair> stateActionPairs = new ArrayList<>();
+
+    public Qlearning(Racecar racecar, char[][] course, double discountFactor, double learningRate) {
+        this.discountFactor = discountFactor;
+        this.learningRate = learningRate;
         // enumerate all states
         ArrayList<State> states = new ArrayList<>();
         for (int i = 0; i < course.length; i++) {
@@ -23,65 +28,58 @@ public class Qlearning {
             }
         }
         // initialize Qtable randomly, based on states action pair
-        ArrayList<StateActionPair> stateActionPairs=new ArrayList<>();
-        ArrayList<Double> qtableValues=new ArrayList<>();
-        Random random=new Random();
-        random.setSeed(System.nanoTime());
         for (State state : states) {
             for (Action action : actions) {
-                stateActionPairs.add(new StateActionPair(state,action));    
-                qtableValues.add(random.nextDouble()*10);
+                stateActionPairs.add(new StateActionPair(state, action));
+                qtableValues.add(1.0);
             }
         }
+        // repeat this until reaches finish line
+        while (Boolean.TRUE) {
 
+            Action current_best_Action = new Action();
+            StateActionPair currentStateActionPair= searchQtable(racecar.state, actions);
+            current_best_Action =currentStateActionPair.action;
+            // start picking an action acording to current Qtable
+            racecar.apply_action(current_best_Action, course);
+            int reward = racecar.getReward(course);
+            if (reward == 1000) {
+                break;
+            }
+            racecar.printCarPosition(course);
 
+            int c = 0;
+            // update Qtable for the state action pair according to reward + discount factor
+            // and step size
+            int qtableIndex=this.stateActionPairs.indexOf(currentStateActionPair);
+            Double newQtablevalue=updateQtable(qtableIndex, reward, racecar.state, actions);
+            qtableValues.set(qtableIndex, newQtablevalue);
 
+        }
+    }
 
+    private Double updateQtable( int qValueIndex, int reward, State newState,
+            ArrayList<Action> actions) {
+        Double newvalue = 0.0;
+        Double maxQValueForNextState = this.qtableValues
+                .get(this.stateActionPairs.indexOf(searchQtable(newState, actions)));
+        newvalue = (1 - this.learningRate) * qtableValues.get(qValueIndex)
+                + learningRate * (reward + (this.discountFactor * maxQValueForNextState));
+        return newvalue;
+    }
 
+    private StateActionPair searchQtable(State state, ArrayList<Action> actions) {
         Double current_best_value = 0.0;
-        Action current_best_Action = new Action();
+        int indexOfBestAction = 0;
 
         for (Action action : actions) {
-            int indexOfValue=stateActionPairs.indexOf(new StateActionPair(racecar.state, action));
-            Double current_value=qtableValues.get(indexOfValue);
-            if ( current_value > current_best_value) {
-                current_best_Action = action;
-                current_best_value=current_value;
+            int indexOfValue = stateActionPairs.indexOf(new StateActionPair(state, action));
+            Double current_value = qtableValues.get(indexOfValue);
+            if (current_value > current_best_value) {
+                current_best_value = current_value;
+                indexOfBestAction = indexOfValue;
             }
         }
-        apply_action(racecar, current_best_Action);
-
-        racecar.printCarPosition(course);
-        int c = 0;
-        // repeat this until ...
-        // start picking an action acording to current Qtable
-        // update Qtable for the state action pair according to reward + discount factor
-        // and step size
-        // repeat
-        
-    }
-    public Racecar apply_action(Racecar racecar, Action action){
-        
-        racecar.state.xSpeed+= action.xAcceleration;
-        racecar.state.ySpeed+= action.yAcceleration;
-
-        //check speed boundaries
-        if(racecar.state.xSpeed > 5){
-            racecar.state.xSpeed = 5;
-        }
-        if(racecar.state.xSpeed < -5){
-            racecar.state.xSpeed = -5;
-        }
-        if(racecar.state.ySpeed > 5){
-            racecar.state.ySpeed = 5;
-        }
-        if(racecar.state.ySpeed < -5){
-            racecar.state.ySpeed = -5;
-        }
-
-
-        racecar.state.xPosition+=racecar.state.xSpeed;
-        racecar.state.yPosition+=racecar.state.ySpeed;
-        return racecar;
+        return stateActionPairs.get(indexOfBestAction);
     }
 }

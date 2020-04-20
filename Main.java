@@ -8,6 +8,6 @@ public class Main {
         ReadFile read = new ReadFile(filename);
         char[][] course=read.getCourse();
         Racecar racecar=new Racecar(course);
-        new Qlearning(racecar, course);
+        new Qlearning(racecar, course,0.9,0.2);
     }
 }
