@@ -5,8 +5,16 @@ public class Racecar {
 
     State state = new State();
     Action action = new Action();
+    int[][] history;
 
     public Racecar(char[][] course) {
+        
+        this.history = new int[course.length][course[0].length];
+        this.initCarPositon(course);
+        printCarPosition(course);
+    }
+
+    public void initCarPositon(char[][] course) {
         ArrayList<Integer> startxposition = new ArrayList<>();
         ArrayList<Integer> startyposition = new ArrayList<>();
         for (int i = 0; i < course.length; i++) {
@@ -20,7 +28,8 @@ public class Racecar {
         Random random = new Random();
         this.state.xPosition = startxposition.get(random.nextInt(startxposition.size()));
         this.state.yPosition = startyposition.get(random.nextInt(startyposition.size()));
-        printCarPosition(course);
+        this.state.xSpeed=0;
+        this.state.ySpeed=0;
     }
 
     public void printCarPosition(char[][] course) {
@@ -46,7 +55,11 @@ public class Racecar {
         }
         if (course[this.state.xPosition][this.state.yPosition] == 'F') {
             reward = 1000;
+            return reward;
         }
+        reward += this.history[this.state.xPosition][this.state.yPosition] * -100;
+        this.history[this.state.xPosition][this.state.yPosition] += 1;
+
         return reward;
     }
 
@@ -77,7 +90,7 @@ public class Racecar {
         this.state.xPosition += this.state.xSpeed;
         this.state.yPosition += this.state.ySpeed;
 
-        // check track boundaries and if it 
+        // check track boundaries and if it crossed a wall
         int reward;
         if (this.state.xPosition >= course.length || this.state.yPosition >= course[0].length
                 || this.state.xPosition < 0 || this.state.yPosition < 0
@@ -87,7 +100,8 @@ public class Racecar {
             this.state.ySpeed = 0;
             this.state.xPosition = previousXPostion;
             this.state.yPosition = previousYPosition;
-            reward = -1000;
+            reward = this.getReward(course);
+            reward += -1000;
         } else {
             reward = this.getReward(course);
             // check if we landed on a wall
