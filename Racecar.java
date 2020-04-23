@@ -1,3 +1,4 @@
+//import.java.lang.*;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -8,7 +9,7 @@ public class Racecar {
     int[][] history;
 
     public Racecar(char[][] course) {
-        
+
         this.history = new int[course.length][course[0].length];
         this.initCarPositon(course);
         printCarPosition(course);
@@ -28,8 +29,8 @@ public class Racecar {
         Random random = new Random();
         this.state.xPosition = startxposition.get(random.nextInt(startxposition.size()));
         this.state.yPosition = startyposition.get(random.nextInt(startyposition.size()));
-        this.state.xSpeed=0;
-        this.state.ySpeed=0;
+        this.state.xSpeed = 0;
+        this.state.ySpeed = 0;
     }
 
     public void printCarPosition(char[][] course) {
@@ -45,13 +46,18 @@ public class Racecar {
         }
     }
 
-    public int getReward(char[][] course) {
+    public int getReward(char[][] course, int previousXPostion, int previousYPosition) {
         int reward = 0;
         if (course[this.state.xPosition][this.state.yPosition] == '.') {
             reward = 100;
         }
         if (course[this.state.xPosition][this.state.yPosition] == '#') {
             reward = -1000;
+        }
+
+        if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course, 'F')) {
+            reward = 1000;
+            return reward;
         }
         if (course[this.state.xPosition][this.state.yPosition] == 'F') {
             reward = 1000;
@@ -91,19 +97,20 @@ public class Racecar {
         this.state.yPosition += this.state.ySpeed;
 
         // check track boundaries and if it crossed a wall
+        DDA(1, 10, 2, 12, course, '#');
         int reward;
         if (this.state.xPosition >= course.length || this.state.yPosition >= course[0].length
-                || this.state.xPosition < 0 || this.state.yPosition < 0
-                || bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course)) {
+                || this.state.xPosition < 0 || this.state.yPosition < 0 || bresenham(this.state.xPosition,
+                        this.state.yPosition, previousXPostion, previousYPosition, course, '#')) {
 
             this.state.xSpeed = 0;
             this.state.ySpeed = 0;
             this.state.xPosition = previousXPostion;
             this.state.yPosition = previousYPosition;
-            reward = this.getReward(course);
+            reward = this.getReward(course, previousXPostion, previousYPosition);
             reward += -1000;
         } else {
-            reward = this.getReward(course);
+            reward = this.getReward(course, previousXPostion, previousYPosition);
             // check if we landed on a wall
             if (course[this.state.xPosition][this.state.yPosition] == '#') {
                 this.state.xSpeed = 0;
@@ -116,7 +123,7 @@ public class Racecar {
         return reward;
     }
 
-    boolean bresenham(int x1, int y1, int x2, int y2, char[][] course) {
+    boolean bresenham(int x1, int y1, int x2, int y2, char[][] course, char cross) {
         int m_new = 2 * (y2 - y1);
         int slope_error_new = m_new - (x2 - x1);
         Boolean crossedWall = Boolean.FALSE;
@@ -144,12 +151,12 @@ public class Racecar {
 
             // check if we cross a wall
             if (wasOutOfBound) {
-                if (course[newx][newy] == '#') {
+                if (course[newx][newy] == cross) {
                     crossedWall = Boolean.TRUE;
                 }
 
             } else {
-                if (course[x][y] == '#') {
+                if (course[x][y] == cross) {
                     crossedWall = Boolean.TRUE;
                 }
             }
@@ -162,5 +169,32 @@ public class Racecar {
             }
         }
         return crossedWall;
+    }
+
+    boolean DDA(int x1, int y1, int x2, int y2, char[][] course, char cross){
+        int dx = x2 - x1;
+        int dy = y2 - y1;
+        int steps;
+        if(Math.abs(dx) > Math.abs(dy)){
+            steps = Math.abs(dx);
+        }
+        else{
+            steps = Math.abs(dy);
+        }
+        Double xIncrement=dx/ (double)steps;
+        Double yIncrement=dy/(double) steps;
+        Double x = x1 + 0.0;
+        Double y = y1+0.0;
+        Boolean crossed=Boolean.FALSE;
+        for (int i = 0; i < steps; i++) {
+            x += xIncrement;
+            y += yIncrement;
+
+            //check if cross
+            if(course[(int)Math.round(y)][(int)Math.round(x)]=='#'){
+                crossed=Boolean.TRUE;
+            }
+        }
+        return crossed;
     }
 }
