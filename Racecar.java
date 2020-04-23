@@ -1,4 +1,4 @@
-//import.java.lang.*;
+import java.lang.Math;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -40,6 +40,7 @@ public class Racecar {
                     System.out.print("C");
                     continue;
                 }
+                
                 System.out.print(course[i][j]);
             }
             System.out.println("");
@@ -97,7 +98,9 @@ public class Racecar {
         this.state.yPosition += this.state.ySpeed;
 
         // check track boundaries and if it crossed a wall
-        DDA(1, 10, 2, 12, course, '#');
+
+        //TEST
+        // bresenham(3, 5, 5, 1, course, '#');
         int reward;
         if (this.state.xPosition >= course.length || this.state.yPosition >= course[0].length
                 || this.state.xPosition < 0 || this.state.yPosition < 0 || bresenham(this.state.xPosition,
@@ -123,78 +126,31 @@ public class Racecar {
         return reward;
     }
 
-    boolean bresenham(int x1, int y1, int x2, int y2, char[][] course, char cross) {
-        int m_new = 2 * (y2 - y1);
-        int slope_error_new = m_new - (x2 - x1);
-        Boolean crossedWall = Boolean.FALSE;
-        for (int x = x1, y = y1; x <= x2; x++) {
-            // check for bound
-            Boolean wasOutOfBound = Boolean.FALSE;
-            int newx = x;
-            int newy = y;
-            if (x >= course.length) {
-                wasOutOfBound = Boolean.TRUE;
-                newx = course.length - 1;
-            }
-            if (y >= course[0].length) {
-                wasOutOfBound = Boolean.TRUE;
-                newy = course[0].length - 1;
-            }
-            if (x < 0) {
-                wasOutOfBound = Boolean.TRUE;
-                newx = 0;
-            }
-            if (y < 0) {
-                wasOutOfBound = Boolean.TRUE;
-                newy = 0;
-            }
+    boolean bresenham(int x1, int y1, int x2, int y2, char[][] course, char cross){
+        int dx = Math.abs(x2 - x1);
+        int dy = Math.abs(y2 - y1);
+        int sx = x1 < x2 ? 1 : -1;
+        int sy = y1 < y2 ? 1 : -1;
 
-            // check if we cross a wall
-            if (wasOutOfBound) {
-                if (course[newx][newy] == cross) {
-                    crossedWall = Boolean.TRUE;
-                }
+        int err = dx-dy;
+        int e2;
 
-            } else {
-                if (course[x][y] == cross) {
-                    crossedWall = Boolean.TRUE;
-                }
+        while(true){
+            if(course[x1][y1] == cross){
+                return true;
             }
-
-            slope_error_new += m_new;
-
-            if (slope_error_new >= 0) {
-                y++;
-                slope_error_new -= 2 * (x2 - x1);
+            if(x1 == x2 && y1 == y2)
+                break;
+            e2 = 2 * err;
+            if(e2 > -dy){
+                err = err - dy;
+                x1 = x1 + sx;
+            }
+            if(e2 < dx){
+                err = err + dx;
+                y1 = y1 + sy;
             }
         }
-        return crossedWall;
-    }
-
-    boolean DDA(int x1, int y1, int x2, int y2, char[][] course, char cross){
-        int dx = x2 - x1;
-        int dy = y2 - y1;
-        int steps;
-        if(Math.abs(dx) > Math.abs(dy)){
-            steps = Math.abs(dx);
-        }
-        else{
-            steps = Math.abs(dy);
-        }
-        Double xIncrement=dx/ (double)steps;
-        Double yIncrement=dy/(double) steps;
-        Double x = x1 + 0.0;
-        Double y = y1+0.0;
-        Boolean crossed=Boolean.FALSE;
-        for (int i = 0; i < steps; i++) {
-            x += xIncrement;
-            y += yIncrement;
-
-            //check if cross
-            if(course[(int)Math.round(y)][(int)Math.round(x)]=='#'){
-                crossed=Boolean.TRUE;
-            }
-        }
-        return crossed;
+        return false;
     }
 }
