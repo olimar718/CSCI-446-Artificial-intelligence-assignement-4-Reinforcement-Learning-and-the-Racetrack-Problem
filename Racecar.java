@@ -27,8 +27,8 @@ public class Racecar {
             }
         }
         Random random = new Random();
-        this.state.xPosition = startxposition.get(random.nextInt(startxposition.size()));
-        this.state.yPosition = startyposition.get(random.nextInt(startyposition.size()));
+        this.state.xPosition = startxposition.get(0);//this.state.xPosition = startxposition.get(random.nextInt(startxposition.size()));
+        this.state.yPosition = startyposition.get(0);//this.state.yPosition = startyposition.get(random.nextInt(startyposition.size()));
         this.state.xSpeed = 0;
         this.state.ySpeed = 0;
     }
@@ -71,8 +71,8 @@ public class Racecar {
     }
 
     public int apply_action(Action action, char[][] course) {
-        if (Math.random() <= .2) {// non determinism as required
-        } else {
+        // if (Math.random() <= .2) {// non determinism as required
+        // } else {
             this.state.xSpeed += action.xAcceleration;
             this.state.ySpeed += action.yAcceleration;
 
@@ -89,7 +89,7 @@ public class Racecar {
             if (this.state.ySpeed < -5) {
                 this.state.ySpeed = -5;
             }
-        }
+        // }
 
         // backup in case we hit a wall
         int previousXPostion = this.state.xPosition;
@@ -101,18 +101,20 @@ public class Racecar {
 
         //TEST
         // bresenham(3, 5, 5, 1, course, '#');
-        int reward;
+        int reward=0;
         if (this.state.xPosition >= course.length || this.state.yPosition >= course[0].length
-                || this.state.xPosition < 0 || this.state.yPosition < 0 || bresenham(this.state.xPosition,
-                        this.state.yPosition, previousXPostion, previousYPosition, course, '#')) {
+                || this.state.xPosition < 0 || this.state.yPosition < 0) {
 
             this.state.xSpeed = 0;
             this.state.ySpeed = 0;
             this.state.xPosition = previousXPostion;
             this.state.yPosition = previousYPosition;
-            reward = this.getReward(course, previousXPostion, previousYPosition);
             reward += -1000;
-        } else {
+        } 
+        else if(bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course, '#')){
+            reward -= 1000;
+        }
+        else {
             reward = this.getReward(course, previousXPostion, previousYPosition);
             // check if we landed on a wall
             if (course[this.state.xPosition][this.state.yPosition] == '#') {

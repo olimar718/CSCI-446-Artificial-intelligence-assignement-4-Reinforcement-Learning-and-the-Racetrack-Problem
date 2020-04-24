@@ -31,7 +31,7 @@ public class Qlearning {
         for (State state : states) {
             for (Action action : actions) {
                 stateActionPairs.add(new StateActionPair(state, action));
-                qtableValues.add(Math.random() * 10);
+                qtableValues.add(Math.random()*10);
             }
         }
         // 100 races to learn
@@ -45,13 +45,16 @@ public class Qlearning {
                 current_best_Action = currentStateActionPair.action;
                 // start picking an action acording to current Qtable
                 int reward = racecar.apply_action(current_best_Action, course);
-                // racecar.printCarPosition(course);
+                //racecar.printCarPosition(course);
 
 
                 // update Qtable for the state action pair according to reward + discount factor
                 // and step size
                 int qtableIndex = this.stateActionPairs.indexOf(currentStateActionPair);
-                Double newQtablevalue = updateQtable(qtableIndex, reward, racecar.state, actions);
+
+                int updatedReward = reward + (number_of_action * -1);
+
+                Double newQtablevalue = updateQtable(qtableIndex, updatedReward, racecar.state, actions);
                 this.qtableValues.set(qtableIndex, newQtablevalue);
                 if (reward == 1000) {// reached the finish line
                     break;
@@ -59,9 +62,6 @@ public class Qlearning {
 
             }
             System.out.println(number_of_action);
-            if(number_of_action<15){
-                int nb=0;
-            }
             racecar.initCarPositon(course);
         }
     }
@@ -76,7 +76,7 @@ public class Qlearning {
     }
 
     private StateActionPair searchQtable(State state, ArrayList<Action> actions) {
-        int indexOfBestAction = stateActionPairs.indexOf(new StateActionPair(state, new Action()));;
+        int indexOfBestAction = stateActionPairs.indexOf(new StateActionPair(state, new Action()));
         Double current_best_value = qtableValues.get(indexOfBestAction);
 
         for (Action action : actions) {
