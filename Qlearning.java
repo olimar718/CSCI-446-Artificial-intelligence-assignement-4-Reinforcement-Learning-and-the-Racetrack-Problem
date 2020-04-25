@@ -34,25 +34,24 @@ public class Qlearning {
                 qtableValues.add(Math.random()*10);
             }
         }
-        // 100 races to learn
-        for (int i = 0; i < 10000; i++) {
+        // Number of races
+        for (int i = 0; i < 1000000; i++) {
             // repeat this until reaches finish line
             int number_of_action = 0;
+            Action current_best_Action = new Action();
             while (Boolean.TRUE) {
                 number_of_action++;
-                Action current_best_Action = new Action();
                 StateActionPair currentStateActionPair = searchQtable(racecar.state, actions);
                 current_best_Action = currentStateActionPair.action;
                 // start picking an action acording to current Qtable
                 int reward = racecar.apply_action(current_best_Action, course);
-                //racecar.printCarPosition(course);
-
+                // racecar.printCarPosition(course);
 
                 // update Qtable for the state action pair according to reward + discount factor
                 // and step size
                 int qtableIndex = this.stateActionPairs.indexOf(currentStateActionPair);
 
-                int updatedReward = reward + (number_of_action * -1);
+                int updatedReward = reward + (number_of_action * -5);
 
                 Double newQtablevalue = updateQtable(qtableIndex, updatedReward, racecar.state, actions);
                 this.qtableValues.set(qtableIndex, newQtablevalue);
@@ -60,6 +59,10 @@ public class Qlearning {
                     break;
                 }
 
+                //max number of tries per itteration
+                if(number_of_action == 500){
+                    break;
+                }
             }
             System.out.println(number_of_action);
             racecar.initCarPositon(course);

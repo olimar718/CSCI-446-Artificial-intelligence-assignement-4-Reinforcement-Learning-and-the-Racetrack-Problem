@@ -6,11 +6,11 @@ public class Racecar {
 
     State state = new State();
     Action action = new Action();
-    int[][] history;
+    // int[][] history;
 
     public Racecar(char[][] course) {
 
-        this.history = new int[course.length][course[0].length];
+        // this.history = new int[course.length][course[0].length];
         this.initCarPositon(course);
         printCarPosition(course);
     }
@@ -26,9 +26,10 @@ public class Racecar {
                 }
             }
         }
-        Random random = new Random();
-        this.state.xPosition = startxposition.get(0);//this.state.xPosition = startxposition.get(random.nextInt(startxposition.size()));
-        this.state.yPosition = startyposition.get(0);//this.state.yPosition = startyposition.get(random.nextInt(startyposition.size()));
+        
+        Random rand = new Random();
+        this.state.xPosition = startxposition.get(rand.nextInt(startxposition.size()));
+        this.state.yPosition = startyposition.get(rand.nextInt(startyposition.size()));
         this.state.xSpeed = 0;
         this.state.ySpeed = 0;
     }
@@ -52,20 +53,21 @@ public class Racecar {
         if (course[this.state.xPosition][this.state.yPosition] == '.') {
             reward = 100;
         }
-        if (course[this.state.xPosition][this.state.yPosition] == '#') {
+        //if the car has reached a checkpoint
+        //TODO: might want to implement so that it only recieves each reward once per itteration
+        else if(bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course, 'p')) {
+            reward = 110;
+            // this.history[this.state.xPosition][this.state.yPosition] += 1;
+        }
+        else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course, '#')) {
             reward = -1000;
         }
 
-        if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course, 'F')) {
-            reward = 1000;
-            return reward;
+        else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course, 'F')) {
+            return 1000;
         }
-        if (course[this.state.xPosition][this.state.yPosition] == 'F') {
-            reward = 1000;
-            return reward;
-        }
-        reward += this.history[this.state.xPosition][this.state.yPosition] * -100;
-        this.history[this.state.xPosition][this.state.yPosition] += 1;
+        // reward += this.history[this.state.xPosition][this.state.yPosition] * -100;
+        // this.history[this.state.xPosition][this.state.yPosition] += 1;
 
         return reward;
     }
@@ -77,18 +79,10 @@ public class Racecar {
             this.state.ySpeed += action.yAcceleration;
 
             // check speed boundaries
-            if (this.state.xSpeed > 5) {
-                this.state.xSpeed = 5;
-            }
-            if (this.state.xSpeed < -5) {
-                this.state.xSpeed = -5;
-            }
-            if (this.state.ySpeed > 5) {
-                this.state.ySpeed = 5;
-            }
-            if (this.state.ySpeed < -5) {
-                this.state.ySpeed = -5;
-            }
+            this.state.xSpeed = (this.state.xSpeed > 5) ? 5 : this.state.xSpeed;
+            this.state.xSpeed = (this.state.xSpeed < -5) ? -5 : this.state.xSpeed;
+            this.state.ySpeed = (this.state.ySpeed > 5) ? 5 : this.state.ySpeed;
+            this.state.ySpeed = (this.state.ySpeed < -5) ? -5 : this.state.ySpeed;
         // }
 
         // backup in case we hit a wall
@@ -97,32 +91,20 @@ public class Racecar {
         this.state.xPosition += this.state.xSpeed;
         this.state.yPosition += this.state.ySpeed;
 
-        // check track boundaries and if it crossed a wall
-
-        //TEST
-        // bresenham(3, 5, 5, 1, course, '#');
-        int reward=0;
+        // check track boundaries or if car crossed a wall
+        int reward;
         if (this.state.xPosition >= course.length || this.state.yPosition >= course[0].length
-                || this.state.xPosition < 0 || this.state.yPosition < 0) {
-
+                || this.state.xPosition < 0 || this.state.yPosition < 0 || bresenham(this.state.xPosition,
+                        this.state.yPosition, previousXPostion, previousYPosition, course, '#')) {
             this.state.xSpeed = 0;
             this.state.ySpeed = 0;
             this.state.xPosition = previousXPostion;
             this.state.yPosition = previousYPosition;
-            reward += -1000;
+            reward = this.getReward(course, previousXPostion, previousYPosition);
+            // reward -= 1000;
         } 
-        else if(bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course, '#')){
-            reward -= 1000;
-        }
         else {
             reward = this.getReward(course, previousXPostion, previousYPosition);
-            // check if we landed on a wall
-            if (course[this.state.xPosition][this.state.yPosition] == '#') {
-                this.state.xSpeed = 0;
-                this.state.ySpeed = 0;
-                this.state.xPosition = previousXPostion;
-                this.state.yPosition = previousYPosition;
-            }
         }
 
         return reward;
