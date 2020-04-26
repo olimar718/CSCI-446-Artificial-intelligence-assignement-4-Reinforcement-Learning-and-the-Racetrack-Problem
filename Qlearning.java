@@ -10,30 +10,15 @@ public class Qlearning {
         this.discountFactor = discountFactor;
         this.learningRate = learningRate;
         // enumerate all states
-        ArrayList<State> states = new ArrayList<>();
-        for (int i = 0; i < course.length; i++) {
-            for (int j = 0; j < course[i].length; j++) {
-                for (int k = -5; k < 6; k++) {
-                    for (int l = -5; l < 6; l++) {
-                        states.add(new State(i, j, k, l));
-                    }
-                }
-            }
-        }
-        ArrayList<Action> actions = new ArrayList<>();
-        // enumerates all action
-        for (int i = -1; i < 2; i++) {
-            for (int j = -1; j < 2; j++) {
-                actions.add(new Action(i, j));
-            }
-        }
+        ArrayList<State> states = Learning.enumerateAllStates(course);
+        // enumerate all actions
+        ArrayList<Action> actions = Learning.enumerateAllActions(course);
         // initialize Qtable randomly, based on states action pair
-        for (State state : states) {
-            for (Action action : actions) {
-                stateActionPairs.add(new StateActionPair(state, action));
-                qtableValues.add(Math.random()*10);
-            }
+        this.stateActionPairs = Learning.enumerateAllStateActionPairs(states, actions);
+        for (StateActionPair stateActionPair : stateActionPairs) {
+            this.qtableValues.add(Math.random() * 10);
         }
+
         // Number of races
         for (int i = 0; i < 1000000; i++) {
             // repeat this until reaches finish line
@@ -41,7 +26,8 @@ public class Qlearning {
             Action current_best_Action = new Action();
             while (Boolean.TRUE) {
                 number_of_action++;
-                StateActionPair currentStateActionPair = searchQtable(racecar.state, actions);
+                StateActionPair currentStateActionPair = Learning.searchQtable(racecar.state, actions, stateActionPairs,
+                        qtableValues);
                 current_best_Action = currentStateActionPair.action;
                 // start picking an action acording to current Qtable
                 int reward = racecar.apply_action(current_best_Action, course);
@@ -59,8 +45,8 @@ public class Qlearning {
                     break;
                 }
 
-                //max number of tries per itteration
-                if(number_of_action == 500){
+                // max number of tries per itteration
+                if (number_of_action == 500) {
                     break;
                 }
             }
@@ -71,25 +57,10 @@ public class Qlearning {
 
     private Double updateQtable(int qValueIndex, int reward, State newState, ArrayList<Action> actions) {
         Double newvalue = 0.0;
-        Double maxQValueForNextState = this.qtableValues
-                .get(this.stateActionPairs.indexOf(searchQtable(newState, actions)));
+        Double maxQValueForNextState = this.qtableValues.get(this.stateActionPairs
+                .indexOf(Learning.searchQtable(newState, actions, stateActionPairs, qtableValues)));
         newvalue = (1 - this.learningRate) * qtableValues.get(qValueIndex)
                 + this.learningRate * (reward + (this.discountFactor * maxQValueForNextState));
         return newvalue;
-    }
-
-    private StateActionPair searchQtable(State state, ArrayList<Action> actions) {
-        int indexOfBestAction = stateActionPairs.indexOf(new StateActionPair(state, new Action()));
-        Double current_best_value = qtableValues.get(indexOfBestAction);
-
-        for (Action action : actions) {
-            int indexOfValue = stateActionPairs.indexOf(new StateActionPair(state, action));
-            Double current_value = qtableValues.get(indexOfValue);
-            if (current_value > current_best_value) {
-                current_best_value = current_value;
-                indexOfBestAction = indexOfValue;
-            }
-        }
-        return stateActionPairs.get(indexOfBestAction);
     }
 }
