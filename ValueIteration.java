@@ -21,9 +21,11 @@ public class ValueIteration {
                 for (Action action : actions) {
 
                     Racecar racecar = new Racecar(course);
-                    racecar.state = state;
-                    int reward = racecar.apply_action(action, course);
-                    double discountedReward = computeDiscountedReward(previousValueFunction, states);
+                    racecar.state = (State) state.clone();
+                    int reward = racecar.apply_action(action, course, null);
+                    racecar.state = (State) state.clone();
+                    double discountedReward = computeDiscountedReward(previousValueFunction, states, racecar, action,
+                            course);
                     qtableValues[stateActionPairs.indexOf(new StateActionPair(state, action))] = reward
                             + discountFactor * discountedReward;
                 }
@@ -33,7 +35,9 @@ public class ValueIteration {
                 currentValueFunction[states.indexOf(state)] = qtableValues[stateActionPairs
                         .indexOf(new StateActionPair(state, actions.get(actionIndex)))];
             }
-
+            if (thresholdCheck(epsilon, states, previousValueFunction, currentValueFunction)) {
+                break;
+            }
         }
     }
 
@@ -48,9 +52,16 @@ public class ValueIteration {
         return thresoldReached;
     }
 
-    public double computeDiscountedReward(double[] previousValueFunction, ArrayList<State> states) {// hard not complete
-                                                                                                    // yet
-        return 0.0;
+    public double computeDiscountedReward(double[] previousValueFunction, ArrayList<State> states, Racecar racecar,
+            Action action, char[][] course) {// hard not complete yet
+        State stateBackup = (State) racecar.state.clone();
+        racecar.apply_action(action, course, Boolean.TRUE);
+        State accelerated = (State) racecar.state.clone();
+        racecar.state = (State) stateBackup.clone();
+        racecar.apply_action(action, course, Boolean.FALSE);
+        State didNotAccelerate = (State) racecar.state.clone();
+        return previousValueFunction[states.indexOf(accelerated)] * 0.8
+                + previousValueFunction[states.indexOf(didNotAccelerate)] * 0.2;
     }
 
     public void raceApplyingPolicy() {

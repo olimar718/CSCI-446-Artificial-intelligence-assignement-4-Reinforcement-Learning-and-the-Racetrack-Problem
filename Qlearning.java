@@ -30,7 +30,7 @@ public class Qlearning {
                         qtableValues);
                 current_best_Action = currentStateActionPair.action;
                 // start picking an action acording to current Qtable
-                int reward = racecar.apply_action(current_best_Action, course);
+                int reward = racecar.apply_action(current_best_Action, course, null);
                 // racecar.printCarPosition(course);
 
                 // update Qtable for the state action pair according to reward + discount factor

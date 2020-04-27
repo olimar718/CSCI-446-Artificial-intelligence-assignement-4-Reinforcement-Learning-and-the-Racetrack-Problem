@@ -6,13 +6,11 @@ public class Racecar {
 
     State state = new State();
     Action action = new Action();
-    // int[][] history;
 
     public Racecar(char[][] course) {
 
-        // this.history = new int[course.length][course[0].length];
         this.initCarPositon(course);
-        printCarPosition(course);
+        //printCarPosition(course);
     }
 
     public void initCarPositon(char[][] course) {
@@ -59,7 +57,6 @@ public class Racecar {
         else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
                 'p')) {
             reward = 110;
-            // this.history[this.state.xPosition][this.state.yPosition] += 1;
         } else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
                 '#')) {
             reward = -1000;
@@ -69,14 +66,23 @@ public class Racecar {
                 'F')) {
             return 1000;
         }
-        // reward += this.history[this.state.xPosition][this.state.yPosition] * -100;
-        // this.history[this.state.xPosition][this.state.yPosition] += 1;
 
         return reward;
     }
 
-    public int apply_action(Action action, char[][] course) {
-        if (Math.random() <= .2) {// non determinism as required
+    public int apply_action(Action action, char[][] course, Boolean valueIterationMode) {
+        Double number = 0.0;
+        if (valueIterationMode == null) {
+            number = Math.random();
+        } else {
+            if (valueIterationMode) {
+                number = 1.0;
+            } else {
+                number = 0.0;
+            }
+
+        }
+        if (number <= .2) {// non determinism as required
         } else {
             this.state.xSpeed += action.xAcceleration;
             this.state.ySpeed += action.yAcceleration;
