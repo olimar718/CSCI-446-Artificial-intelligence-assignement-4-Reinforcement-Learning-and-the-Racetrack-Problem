@@ -74,7 +74,8 @@ public class Racecar {
     public int apply_action(Action action, char[][] course, Boolean valueIterationMode) {
         Double number = 0.0;
         if (valueIterationMode == null) {
-            number = Math.random();
+            //number = Math.random();
+            number = 1.0;
         } else {
             if (valueIterationMode) {
                 number = 1.0;

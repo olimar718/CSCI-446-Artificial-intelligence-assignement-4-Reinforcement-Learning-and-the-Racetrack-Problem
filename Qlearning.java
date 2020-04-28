@@ -3,7 +3,8 @@ import java.util.ArrayList;
 public class Qlearning {
     double discountFactor;
     double learningRate;
-    ArrayList<Double> qtableValues = new ArrayList<>();
+    // ArrayList<Double> qtableValues = new ArrayList<>();
+    double qtableValues[];
     ArrayList<StateActionPair> stateActionPairs = new ArrayList<>();
 
     public Qlearning(Racecar racecar, char[][] course, double discountFactor, double learningRate) {
@@ -15,10 +16,10 @@ public class Qlearning {
         ArrayList<Action> actions = Learning.enumerateAllActions(course);
         // initialize Qtable randomly, based on states action pair
         this.stateActionPairs = Learning.enumerateAllStateActionPairs(states, actions);
-        for (StateActionPair stateActionPair : stateActionPairs) {
-            this.qtableValues.add(Math.random() * 10);
+        this.qtableValues = new double[this.stateActionPairs.size()];
+        for (int i = 0; i < stateActionPairs.size(); i++) {
+            this.qtableValues[i] = Math.random() * 10;
         }
-
         // Number of races
         for (int i = 0; i < 1000000; i++) {
             // repeat this until reaches finish line
@@ -43,7 +44,7 @@ public class Qlearning {
                 int newQValueIndexInit = this.stateActionPairs
                         .indexOf(new StateActionPair(racecar.state, new Action(-1, -1)));
                 Double newQtablevalue = updateQtable(qtableIndex, updatedReward, newQValueIndexInit, actions);
-                this.qtableValues.set(qtableIndex, newQtablevalue);
+                this.qtableValues[qtableIndex] = newQtablevalue;
                 if (reward == 1000) {// reached the finish line
                     break;
                 }
@@ -60,9 +61,9 @@ public class Qlearning {
 
     private Double updateQtable(int qValueIndex, int reward, int newQValueIndexInit, ArrayList<Action> actions) {
         Double newvalue = 0.0;
-        Double maxQValueForNextState = this.qtableValues
-                .get(Learning.searchQtable(newQValueIndexInit, actions, stateActionPairs, qtableValues));
-        newvalue = (1 - this.learningRate) * qtableValues.get(qValueIndex)
+        Double maxQValueForNextState = this.qtableValues[Learning.searchQtable(newQValueIndexInit, actions,
+                stateActionPairs, qtableValues)];
+        newvalue = (1 - this.learningRate) * qtableValues[qValueIndex]
                 + this.learningRate * (reward + (this.discountFactor * maxQValueForNextState));
         return newvalue;
     }

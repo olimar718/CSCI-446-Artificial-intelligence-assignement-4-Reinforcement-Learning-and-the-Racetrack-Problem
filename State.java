@@ -20,11 +20,9 @@ public class State {
     protected Object clone() {
         // TODO Auto-generated method stub
         State state = null;
-        try {
-            state = (State) super.clone();
-        } catch (Exception e) {
-            state = new State(this.xPosition, this.yPosition, this.xSpeed, this.ySpeed);
-        }
+
+        state = new State(this.xPosition, this.yPosition, this.xSpeed, this.ySpeed);
+
         return state;
     }
 

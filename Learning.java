@@ -38,12 +38,12 @@ public class Learning {
     }
 
     public static int searchQtable(int stateActionPairIndex, ArrayList<Action> actions,
-            ArrayList<StateActionPair> stateActionPairs, ArrayList<Double> qtableValues) {
+            ArrayList<StateActionPair> stateActionPairs, double[] qtableValues) {
         int indexOfBestAction = stateActionPairIndex;
         int indexOfValue = indexOfBestAction;
-        Double current_best_value = qtableValues.get(indexOfBestAction);
+        Double current_best_value = qtableValues[indexOfBestAction];
         for (Action action : actions) {
-            Double current_value = qtableValues.get(indexOfValue);
+            Double current_value = qtableValues[indexOfValue];
             if (current_value > current_best_value) {
                 current_best_value = current_value;
                 indexOfBestAction = indexOfValue;
