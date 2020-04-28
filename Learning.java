@@ -37,19 +37,19 @@ public class Learning {
         return stateActionPairs;
     }
 
-    public static StateActionPair searchQtable(State state, ArrayList<Action> actions,
+    public static int searchQtable(State state, ArrayList<Action> actions,
             ArrayList<StateActionPair> stateActionPairs, ArrayList<Double> qtableValues) {
-        int indexOfBestAction = stateActionPairs.indexOf(new StateActionPair(state, new Action()));
+        int indexOfBestAction = stateActionPairs.indexOf(new StateActionPair(state, new Action(-1, -1)));
+        int indexOfValue = indexOfBestAction;
         Double current_best_value = qtableValues.get(indexOfBestAction);
-
         for (Action action : actions) {
-            int indexOfValue = stateActionPairs.indexOf(new StateActionPair(state, action));
             Double current_value = qtableValues.get(indexOfValue);
             if (current_value > current_best_value) {
                 current_best_value = current_value;
                 indexOfBestAction = indexOfValue;
             }
+            indexOfValue++;
         }
-        return stateActionPairs.get(indexOfBestAction);
+        return indexOfBestAction;
     }
 }

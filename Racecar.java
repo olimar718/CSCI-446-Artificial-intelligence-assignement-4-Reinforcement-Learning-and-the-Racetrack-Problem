@@ -26,8 +26,9 @@ public class Racecar {
         }
 
         Random rand = new Random();
-        this.state.xPosition = startxposition.get(rand.nextInt(startxposition.size()));
-        this.state.yPosition = startyposition.get(rand.nextInt(startyposition.size()));
+
+        this.state.xPosition = startxposition.get(0);
+        this.state.yPosition = startyposition.get(0);//rand.nextInt(startyposition.size())
         this.state.xSpeed = 0;
         this.state.ySpeed = 0;
     }

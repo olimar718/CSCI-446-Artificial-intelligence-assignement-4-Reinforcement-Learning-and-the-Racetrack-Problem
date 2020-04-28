@@ -29,10 +29,11 @@ public class ValueIteration {
                     qtableValues[stateActionPairs.indexOf(new StateActionPair(state, action))] = reward
                             + discountFactor * discountedReward;
                 }
-                int actionIndex = actions.indexOf(Learning.searchQtable(state, actions, stateActionPairs,
-                        new ArrayList<Double>(Arrays.asList(qtableValues))).action);
-                policy[states.indexOf(state)] = actionIndex;
-                currentValueFunction[states.indexOf(state)] = qtableValues[stateActionPairs
+                int stateIndex = states.indexOf(state);
+                int actionIndex = actions.indexOf(stateActionPairs.get(Learning.searchQtable(state, actions,
+                        stateActionPairs, new ArrayList<Double>(Arrays.asList(qtableValues)))).action);
+                policy[stateIndex] = actionIndex;
+                currentValueFunction[stateIndex] = qtableValues[stateActionPairs
                         .indexOf(new StateActionPair(state, actions.get(actionIndex)))];
             }
             if (thresholdCheck(epsilon, states, previousValueFunction, currentValueFunction)) {
@@ -43,11 +44,18 @@ public class ValueIteration {
 
     public Boolean thresholdCheck(double epsilon, ArrayList<State> states, double[] previousValueFunction,
             double[] currentValueFunction) {
-        Boolean thresoldReached = Boolean.FALSE;
+        Boolean thresoldReached;
+        Double maxDifference = 0.0;
         for (int i = 0; i < states.size(); i++) {
-            if (Math.abs(previousValueFunction[i] - currentValueFunction[i]) < epsilon) {
-                thresoldReached = Boolean.TRUE;
+            Double currentDifference = (Math.abs(previousValueFunction[i] - currentValueFunction[i]));
+            if (currentDifference > maxDifference) {
+                maxDifference = currentDifference;
             }
+        }
+        if (maxDifference > epsilon) {
+            thresoldReached = Boolean.FALSE;
+        } else {
+            thresoldReached = Boolean.TRUE;
         }
         return thresoldReached;
     }
