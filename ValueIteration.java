@@ -18,6 +18,9 @@ public class ValueIteration {
         while (Boolean.TRUE) {
 
             for (State state : states) {
+
+                int qtableIndex = stateActionPairs.indexOf(new StateActionPair(state, new Action(-1, -1)));
+                int qtableInitIndex = qtableIndex;
                 for (Action action : actions) {
 
                     Racecar racecar = new Racecar(course);
@@ -26,15 +29,14 @@ public class ValueIteration {
                     racecar.state = (State) state.clone();
                     double discountedReward = computeDiscountedReward(previousValueFunction, states, racecar, action,
                             course);
-                    qtableValues[stateActionPairs.indexOf(new StateActionPair(state, action))] = reward
-                            + discountFactor * discountedReward;
+                    qtableValues[qtableIndex] = reward + discountFactor * discountedReward;
+                    qtableIndex++;
                 }
                 int stateIndex = states.indexOf(state);
-                int actionIndex = actions.indexOf(stateActionPairs.get(Learning.searchQtable(state, actions,
+                int actionIndex = actions.indexOf(stateActionPairs.get(Learning.searchQtable(qtableInitIndex, actions,
                         stateActionPairs, new ArrayList<Double>(Arrays.asList(qtableValues)))).action);
                 policy[stateIndex] = actionIndex;
-                currentValueFunction[stateIndex] = qtableValues[stateActionPairs
-                        .indexOf(new StateActionPair(state, actions.get(actionIndex)))];
+                currentValueFunction[stateIndex] = qtableValues[qtableInitIndex+actionIndex];
             }
             if (thresholdCheck(epsilon, states, previousValueFunction, currentValueFunction)) {
                 break;

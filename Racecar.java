@@ -10,7 +10,7 @@ public class Racecar {
     public Racecar(char[][] course) {
 
         this.initCarPositon(course);
-        //printCarPosition(course);
+        // printCarPosition(course);
     }
 
     public void initCarPositon(char[][] course) {
@@ -27,8 +27,8 @@ public class Racecar {
 
         Random rand = new Random();
 
-        this.state.xPosition = startxposition.get(0);
-        this.state.yPosition = startyposition.get(0);//rand.nextInt(startyposition.size())
+        this.state.xPosition = startxposition.get(rand.nextInt(startyposition.size()));
+        this.state.yPosition = startyposition.get(rand.nextInt(startyposition.size()));//
         this.state.xSpeed = 0;
         this.state.ySpeed = 0;
     }

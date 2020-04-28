@@ -37,9 +37,9 @@ public class Learning {
         return stateActionPairs;
     }
 
-    public static int searchQtable(State state, ArrayList<Action> actions,
+    public static int searchQtable(int stateActionPairIndex, ArrayList<Action> actions,
             ArrayList<StateActionPair> stateActionPairs, ArrayList<Double> qtableValues) {
-        int indexOfBestAction = stateActionPairs.indexOf(new StateActionPair(state, new Action(-1, -1)));
+        int indexOfBestAction = stateActionPairIndex;
         int indexOfValue = indexOfBestAction;
         Double current_best_value = qtableValues.get(indexOfBestAction);
         for (Action action : actions) {
