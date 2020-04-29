@@ -7,7 +7,7 @@ public class Qlearning {
     double qtableValues[];
     ArrayList<StateActionPair> stateActionPairs = new ArrayList<>();
 
-    public Qlearning(Racecar racecar, char[][] course, double discountFactor, double learningRate) {
+    public Qlearning(Racecar racecar, char[][] course, double discountFactor, double learningRate,  Boolean badCrash) {
         this.discountFactor = discountFactor;
         this.learningRate = learningRate;
         // enumerate all states
@@ -33,7 +33,7 @@ public class Qlearning {
                         qtableValues);
                 current_best_Action = stateActionPairs.get(currentStateActionPairIndex).action;
                 // start picking an action acording to current Qtable
-                int reward = racecar.apply_action(current_best_Action, course, null);
+                int reward = racecar.apply_action(current_best_Action, course, null, badCrash);
                 // racecar.printCarPosition(course);
 
                 // update Qtable for the state action pair according to reward + discount factor
@@ -45,7 +45,7 @@ public class Qlearning {
                         .indexOf(new StateActionPair(racecar.state, new Action(-1, -1)));
                 Double newQtablevalue = updateQtable(qtableIndex, updatedReward, newQValueIndexInit, actions);
                 this.qtableValues[qtableIndex] = newQtablevalue;
-                if (reward == 1000) {// reached the finish line
+                if (reward == Integer.MAX_VALUE) {// reached the finish line
                     break;
                 }
 

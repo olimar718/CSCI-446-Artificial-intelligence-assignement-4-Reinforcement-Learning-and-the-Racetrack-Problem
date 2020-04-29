@@ -6,7 +6,7 @@ public class ValueIteration {
     // contains the index of the action to take for each state
     int[] policy;
 
-    public ValueIteration(char[][] course, double epsilon, double discountFactor) {
+    public ValueIteration(char[][] course, double epsilon, double discountFactor, Boolean badCrash) {
         ArrayList<State> states = Learning.enumerateAllStates(course);
         ArrayList<Action> actions = Learning.enumerateAllActions(course);
         ArrayList<StateActionPair> stateActionPairs = Learning.enumerateAllStateActionPairs(states, actions);
@@ -26,24 +26,22 @@ public class ValueIteration {
 
                     Racecar racecar = new Racecar(course);
                     racecar.state = (State) state.clone();
-                    int reward = racecar.apply_action(action, course, null);
+                    double reward = computeImediateReward(racecar, action, course, badCrash);
                     racecar.state = (State) state.clone();
                     double discountedReward = computeDiscountedReward(previousValueFunction, states, racecar, action,
-                            course);
+                            course, badCrash);
                     qtableValues[qtableIndex] = reward + (discountFactor * discountedReward);
-                        qtableIndex++;
+                    qtableIndex++;
                 }
                 int stateIndex = states.indexOf(state);
                 int actionIndex = actions.indexOf(stateActionPairs
                         .get(Learning.searchQtable(qtableInitIndex, actions, stateActionPairs, qtableValues)).action);
                 policy[stateIndex] = actionIndex;
                 currentValueFunction[stateIndex] = qtableValues[qtableInitIndex + actionIndex];
-                if((Math.abs(previousValueFunction[stateIndex] - currentValueFunction[stateIndex])>900.0)){
-                    int dss=0;
-                }
+
             }
             if (thresholdCheck(epsilon, states, previousValueFunction, currentValueFunction)) {
-                raceApplyingPolicy(policy, course, states, actions);
+                raceApplyingPolicy(policy, course, states, actions, badCrash);
                 break;
 
             }
@@ -53,13 +51,22 @@ public class ValueIteration {
         }
     }
 
-    public double computeDiscountedReward(double[] previousValueFunction, ArrayList<State> states, Racecar racecar,
-            Action action, char[][] course) {
+    public double computeImediateReward(Racecar racecar, Action action, char[][] course, Boolean badCrash) {
         State stateBackup = (State) racecar.state.clone();
-        racecar.apply_action(action, course, Boolean.TRUE);
+        int acceleratedReward = racecar.apply_action(action, course, Boolean.TRUE, badCrash);
+        racecar.state = (State) stateBackup.clone();
+        int didNotAccelerateReward = racecar.apply_action(action, course, Boolean.FALSE, badCrash);
+
+        return acceleratedReward * 0.8 + didNotAccelerateReward * 0.2;
+    }
+
+    public double computeDiscountedReward(double[] previousValueFunction, ArrayList<State> states, Racecar racecar,
+            Action action, char[][] course, Boolean badCrash) {
+        State stateBackup = (State) racecar.state.clone();
+        racecar.apply_action(action, course, Boolean.TRUE, badCrash);
         State accelerated = (State) racecar.state.clone();
         racecar.state = (State) stateBackup.clone();
-        racecar.apply_action(action, course, Boolean.FALSE);
+        racecar.apply_action(action, course, Boolean.FALSE, badCrash);
         State didNotAccelerate = (State) racecar.state.clone();
         return previousValueFunction[states.indexOf(accelerated)] * 0.8
                 + previousValueFunction[states.indexOf(didNotAccelerate)] * 0.2;
@@ -69,16 +76,13 @@ public class ValueIteration {
             double[] currentValueFunction) {
         Boolean thresoldReached;
         Double maxDifference = 0.0;
-        ArrayList<Integer> test = new ArrayList<>();
         for (int i = 0; i < states.size(); i++) {
             Double currentDifference = (Math.abs(previousValueFunction[i] - currentValueFunction[i]));
             if (currentDifference > maxDifference) {
                 maxDifference = currentDifference;
 
             }
-            if (currentDifference > 900.0) {
-                test.add(i);
-            }
+
         }
         if (maxDifference > epsilon) {
             thresoldReached = Boolean.FALSE;
@@ -89,14 +93,14 @@ public class ValueIteration {
         return thresoldReached;
     }
 
-    public void raceApplyingPolicy(int[] policy, char course[][], ArrayList<State> states, ArrayList<Action> actions) {
+    public void raceApplyingPolicy(int[] policy, char course[][], ArrayList<State> states, ArrayList<Action> actions, Boolean badCrash) {
         Racecar r = new Racecar(course);
         while (Boolean.TRUE) {
             int actionIndex = policy[states.indexOf(r.state)];
-            int reward = r.apply_action(actions.get(actionIndex), course, null);
+            int reward = r.apply_action(actions.get(actionIndex), course, null, badCrash);
 
             r.printCarPosition(course);
-            if (reward == 1000) {
+            if (reward == Integer.MAX_VALUE) {
                 break;
             }
         }

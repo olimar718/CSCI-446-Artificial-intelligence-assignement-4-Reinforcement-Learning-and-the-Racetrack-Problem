@@ -65,13 +65,13 @@ public class Racecar {
 
         else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
                 'F')) {
-            return 1000;
+            return Integer.MAX_VALUE;
         }
 
         return reward;
     }
 
-    public int apply_action(Action action, char[][] course, Boolean valueIterationMode) {
+    public int apply_action(Action action, char[][] course, Boolean valueIterationMode, Boolean badCrash) {
         Double number = 0.0;
         if (valueIterationMode == null) {
             number = Math.random();
@@ -109,6 +109,10 @@ public class Racecar {
                         this.state.yPosition, previousXPostion, previousYPosition, course, '#')) {
             this.state.xSpeed = 0;
             this.state.ySpeed = 0;
+
+            if(badCrash){
+                initCarPositon(course);
+            }
             this.state.xPosition = previousXPostion;
             this.state.yPosition = previousYPosition;
             reward = this.getReward(course, previousXPostion, previousYPosition);
