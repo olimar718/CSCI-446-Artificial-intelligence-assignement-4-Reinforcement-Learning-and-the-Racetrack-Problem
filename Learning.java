@@ -1,13 +1,13 @@
 import java.util.ArrayList;
 
 public class Learning {
-    public static ArrayList<State> enumerateAllStates(char[][] course) {
-        ArrayList<State> states = new ArrayList<>();
+    public static ArrayList<CarState> enumerateAllStates(char[][] course) {
+        ArrayList<CarState> states = new ArrayList<>();
         for (int i = 0; i < course.length; i++) {
             for (int j = 0; j < course[i].length; j++) {
                 for (int k = -5; k < 6; k++) {
                     for (int l = -5; l < 6; l++) {
-                        states.add(new State(i, j, k, l));
+                        states.add(new CarState(i, j, k, l));
                     }
                 }
             }
@@ -26,10 +26,10 @@ public class Learning {
         return actions;
     }
 
-    public static ArrayList<StateActionPair> enumerateAllStateActionPairs(ArrayList<State> states,
+    public static ArrayList<StateActionPair> enumerateAllStateActionPairs(ArrayList<CarState> states,
             ArrayList<Action> actions) {
         ArrayList<StateActionPair> stateActionPairs = new ArrayList<>();
-        for (State state : states) {
+        for (CarState state : states) {
             for (Action action : actions) {
                 stateActionPairs.add(new StateActionPair(state, action));
             }

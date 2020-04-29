@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class Racecar {
 
-    State state = new State();
+    CarState state = new CarState();
     Action action = new Action();
 
     public Racecar(char[][] course) {

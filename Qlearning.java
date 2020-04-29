@@ -11,7 +11,7 @@ public class Qlearning {
         this.discountFactor = discountFactor;
         this.learningRate = learningRate;
         // enumerate all states
-        ArrayList<State> states = Learning.enumerateAllStates(course);
+        ArrayList<CarState> states = Learning.enumerateAllStates(course);
         // enumerate all actions
         ArrayList<Action> actions = Learning.enumerateAllActions(course);
         // initialize Qtable randomly, based on states action pair

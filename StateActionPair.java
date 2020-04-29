@@ -1,9 +1,9 @@
 
 public class StateActionPair {
-    State state;
+    CarState state;
     Action action;
 
-    public StateActionPair(State state, Action action) {
+    public StateActionPair(CarState state, Action action) {
         this.state=state;
         this.action=action;
     }
