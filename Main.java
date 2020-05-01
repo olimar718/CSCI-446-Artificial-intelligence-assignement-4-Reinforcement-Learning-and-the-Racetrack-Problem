@@ -8,7 +8,7 @@ public class Main {
         ReadFile read = new ReadFile(filename);
         char[][] course = read.getCourse();
         Racecar racecar = new Racecar(course);
-        new ValueIteration(course, Math.pow(10.0, 3), .9, Boolean.FALSE);
+        new ValueIteration(course, Math.pow(10.0, 3), .9, Boolean.TRUE);
         //new Qlearning(racecar, course,0.8,0.3,Boolean.TRUE);
     }
 }

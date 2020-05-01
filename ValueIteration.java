@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
 
 public class ValueIteration {
@@ -14,31 +15,36 @@ public class ValueIteration {
         double[] previousValueFunction = new double[states.size()];
         double[] currentValueFunction = new double[states.size()];
         double[] qtableValues = new double[stateActionPairs.size()];
-        Hashtable<StateActionPair,double>  imediateReward=new Hashtable();
+        ArrayList<Double> imediateRewards = new ArrayList<>();
+        ArrayList<Integer> stateIndexAccelerated=new ArrayList<>();
+        ArrayList<Integer> stateIndexDidNotAccelerate=new ArrayList<>();
+        for (StateActionPair stateActionPair : stateActionPairs) {// fill out the imediate rewards
+            Racecar racecar = new Racecar(course);
+            racecar.state = (CarState) stateActionPair.state.clone();
+            imediateRewards.add(computeImediateReward(racecar, stateActionPair.action, course, badCrash));
+            stateIndexAccelerated.add(computeDiscountedRewardStateIndex(states, racecar, stateActionPair.action, course, Boolean.TRUE, badCrash));
+            stateIndexDidNotAccelerate.add(computeDiscountedRewardStateIndex(states, racecar, stateActionPair.action, course, Boolean.FALSE, badCrash));
+        }
+
         int iteration_count = 0;
         while (Boolean.TRUE) {
-
-
+            int qtableIndex = 0;
+            int stateIndex=0;
             for (CarState state : states) {
 
-                int qtableIndex = stateActionPairs.indexOf(new StateActionPair(state, new Action(-1, -1)));
                 int qtableInitIndex = qtableIndex;
                 for (Action action : actions) {
-
-                    Racecar racecar = new Racecar(course);
-                    racecar.state = (CarState) state.clone();
-                    double reward = computeImediateReward(racecar, action, course, badCrash);
-                    racecar.state = (CarState) state.clone();
-                    double discountedReward = computeDiscountedReward(previousValueFunction, states, racecar, action,
-                            course, badCrash);
+                    double reward = imediateRewards.get(qtableIndex);
+                    double discountedReward = 0.8*previousValueFunction[stateIndexAccelerated.get(qtableIndex)]+0.2*previousValueFunction[stateIndexDidNotAccelerate.get(qtableIndex)];
                     qtableValues[qtableIndex] = reward + (discountFactor * discountedReward);
                     qtableIndex++;
                 }
-                int stateIndex = states.indexOf(state);
+                
                 int actionIndex = actions.indexOf(stateActionPairs
                         .get(Learning.searchQtable(qtableInitIndex, actions, stateActionPairs, qtableValues)).action);
                 policy[stateIndex] = actionIndex;
                 currentValueFunction[stateIndex] = qtableValues[qtableInitIndex + actionIndex];
+                stateIndex++;
 
             }
             if (thresholdCheck(epsilon, states, previousValueFunction, currentValueFunction)) {
@@ -65,16 +71,13 @@ public class ValueIteration {
         return acceleratedReward * 0.8 + didNotAccelerateReward * 0.2;
     }
 
-    public double computeDiscountedReward(double[] previousValueFunction, ArrayList<CarState> states, Racecar racecar,
-            Action action, char[][] course, Boolean badCrash) {
-        CarState stateBackup = (CarState) racecar.state.clone();
-        racecar.apply_action(action, course, Boolean.TRUE, badCrash);
-        CarState accelerated = (CarState) racecar.state.clone();
-        racecar.state = (CarState) stateBackup.clone();
-        racecar.apply_action(action, course, Boolean.FALSE, badCrash);
-        CarState didNotAccelerate = (CarState) racecar.state.clone();
-        return previousValueFunction[states.indexOf(accelerated)] * 0.8
-                + previousValueFunction[states.indexOf(didNotAccelerate)] * 0.2;
+
+    public int computeDiscountedRewardStateIndex(ArrayList<CarState> states, Racecar racecar,
+            Action action, char[][] course, Boolean accelerated,Boolean badCrash) {
+
+        racecar.apply_action(action, course, accelerated, badCrash);
+
+        return states.indexOf(racecar.state);
     }
 
     public Boolean thresholdCheck(double epsilon, ArrayList<CarState> states, double[] previousValueFunction,
