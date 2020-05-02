@@ -61,10 +61,7 @@ public class ValueIteration {
             previousValueFunction = currentValueFunction.clone();
             System.out.println(iteration_count);
             iteration_count++;
-            // max number of tries per itteration
-            if (iteration_count == 500) {
-                break;
-            }
+
         }
     }
 

@@ -55,7 +55,7 @@ public class Racecar {
 
     // based on the current and previous position of the car, determine the reward
     // by seeing the position landed on as well as the spaces crosses
-    public int getReward(char[][] course, int previousXPostion, int previousYPosition) {
+    public int getReward(char[][] course, int previousXPostion, int previousYPosition, Boolean badCrash) {
         int reward = 0;
         // normal position
         if (course[this.state.xPosition][this.state.yPosition] == '.') {
@@ -64,12 +64,17 @@ public class Racecar {
         // The car has reached a checkpoint itteration
         else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
                 'p')) {
-            reward = 110;        
-        } 
+            reward = 110;
+        }
         // The car has landed or crossed a wall
         else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
                 '#')) {
-            reward = -1000;
+            if (badCrash) {
+                reward=Integer.MIN_VALUE;
+            } else {
+                reward = -1000;
+            }
+            
         }
         // The car has crossed the finish line
         else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
@@ -82,10 +87,12 @@ public class Racecar {
 
     // This method will apply the action selected. the return is the reward.
     // This method can be called in 2 way depending of the Boolean valueIteration.
-    //If it's null then the car will have 20% probability of not performing the given action
-    //If it's true then the action will be performed(used in value iteration)
-    //If it's false then the action will not be performed(used in value iteration)
-    //The boolean badcrash is used to decide if the car is put back to the start if it hits a wall
+    // If it's null then the car will have 20% probability of not performing the
+    // given action
+    // If it's true then the action will be performed(used in value iteration)
+    // If it's false then the action will not be performed(used in value iteration)
+    // The boolean badcrash is used to decide if the car is put back to the start if
+    // it hits a wall
     public int apply_action(Action action, char[][] course, Boolean valueIterationMode, Boolean badCrash) {
         Double number = 0.0;
         if (valueIterationMode == null) {
@@ -124,24 +131,26 @@ public class Racecar {
                         this.state.yPosition, previousXPostion, previousYPosition, course, '#')) {
             this.state.xSpeed = 0;
             this.state.ySpeed = 0;
-            
 
             if (badCrash) {
                 initCarPositon(course);
-            }else{
+                reward = Integer.MIN_VALUE;
+            } else {
                 this.state.xPosition = previousXPostion;
                 this.state.yPosition = previousYPosition;
+                reward = -1000;
             }
-            //reward = this.getReward(course, previousXPostion, previousYPosition);
-             reward = 1000;
+            // reward = this.getReward(course, previousXPostion, previousYPosition);
+
         } else {
-            reward = this.getReward(course, previousXPostion, previousYPosition);
+            reward = this.getReward(course, previousXPostion, previousYPosition, badCrash);
         }
 
         return reward;
     }
 
-    // This function deals only with integers in order to determine if a given character is crossed from the previous position to the current position
+    // This function deals only with integers in order to determine if a given
+    // character is crossed from the previous position to the current position
     boolean bresenham(int x1, int y1, int x2, int y2, char[][] course, char cross) {
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
