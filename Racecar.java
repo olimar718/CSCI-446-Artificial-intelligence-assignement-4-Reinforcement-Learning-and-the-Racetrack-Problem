@@ -66,6 +66,11 @@ public class Racecar {
                 'p')) {
             reward = 110;
         }
+        // The car has crossed the finish line
+        else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
+            'F')) {
+            return Integer.MAX_VALUE;
+        }
         // The car has landed or crossed a wall
         else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
                 '#')) {
@@ -76,11 +81,7 @@ public class Racecar {
             }
             
         }
-        // The car has crossed the finish line
-        else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
-                'F')) {
-            return Integer.MAX_VALUE;
-        }
+
 
         return reward;
     }
