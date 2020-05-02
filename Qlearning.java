@@ -1,12 +1,16 @@
+/**
+ * This implements all of the qlearning algorithm
+ */
+
 import java.util.ArrayList;
 
 public class Qlearning {
     double discountFactor;
     double learningRate;
-    // ArrayList<Double> qtableValues = new ArrayList<>();
     double qtableValues[];
     ArrayList<StateActionPair> stateActionPairs = new ArrayList<>();
 
+    //primary constructor
     public Qlearning(Racecar racecar, char[][] course, double discountFactor, double learningRate,  Boolean badCrash) {
         this.discountFactor = discountFactor;
         this.learningRate = learningRate;
@@ -17,6 +21,7 @@ public class Qlearning {
         // initialize Qtable randomly, based on states action pair
         this.stateActionPairs = Learning.enumerateAllStateActionPairs(states, actions);
         this.qtableValues = new double[this.stateActionPairs.size()];
+        //assign arbitrary values to each cell in the q learning table, this value is less than a reward it recieves from a positive action
         for (int i = 0; i < stateActionPairs.size(); i++) {
             this.qtableValues[i] = Math.random() * 10;
         }
@@ -24,9 +29,12 @@ public class Qlearning {
         for (int i = 0; i < 1000000; i++) {
             // repeat this until reaches finish line
             int number_of_action = 0;
+            //a way to store an action thatis better than the previous
             Action current_best_Action = new Action();
+            //continue until the racecar reaches the finish line or 500 iterations are reached
             while (Boolean.TRUE) {
                 number_of_action++;
+                // get the value at the first action at the state of the racecar
                 int qtableStartIndex = this.stateActionPairs
                         .indexOf(new StateActionPair(racecar.state, new Action(-1, -1)));
                 int currentStateActionPairIndex = Learning.searchQtable(qtableStartIndex, actions, stateActionPairs,
@@ -40,9 +48,13 @@ public class Qlearning {
                 // and step size
                 int qtableIndex = currentStateActionPairIndex;
 
+                //reassign the reward with a negative effct based on the number of actions taken
                 int updatedReward = reward + (number_of_action * -5);
+
+                // get the value at the first action at the state of the racecar
                 int newQValueIndexInit = this.stateActionPairs
                         .indexOf(new StateActionPair(racecar.state, new Action(-1, -1)));
+                //from the information above udate the q table location to the new value
                 Double newQtablevalue = updateQtable(qtableIndex, updatedReward, newQValueIndexInit, actions);
                 this.qtableValues[qtableIndex] = newQtablevalue;
                 if (reward == Integer.MAX_VALUE) {// reached the finish line
@@ -59,6 +71,7 @@ public class Qlearning {
         }
     }
 
+    // From all the new information, update the value of the current qtable position
     private Double updateQtable(int qValueIndex, int reward, int newQValueIndexInit, ArrayList<Action> actions) {
         Double newvalue = 0.0;
         Double maxQValueForNextState = this.qtableValues[Learning.searchQtable(newQValueIndexInit, actions,

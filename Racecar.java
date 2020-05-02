@@ -1,3 +1,8 @@
+
+/**
+ * This class holds data corresponding to the racecar and its differing attributes
+ * This also contains functions that are related to both qlearning and valueIteration
+ */
 import java.lang.Math;
 import java.util.ArrayList;
 import java.util.Random;
@@ -5,7 +10,7 @@ import java.util.Random;
 public class Racecar {
 
     CarState state = new CarState();
-    //Action action = new Action();
+    // Action action = new Action();
 
     public Racecar(char[][] course) {
 
@@ -13,6 +18,7 @@ public class Racecar {
         // printCarPosition(course);
     }
 
+    // Place the car stopped on a random S position
     public void initCarPositon(char[][] course) {
         ArrayList<Integer> startxposition = new ArrayList<>();
         ArrayList<Integer> startyposition = new ArrayList<>();
@@ -47,22 +53,25 @@ public class Racecar {
         }
     }
 
+    // based on the current and previous position of the car, determine the reward
+    // by seeing the position landed on as well as the spaces crosses
     public int getReward(char[][] course, int previousXPostion, int previousYPosition) {
         int reward = 0;
+        // normal position
         if (course[this.state.xPosition][this.state.yPosition] == '.') {
             reward = 100;
         }
-        // if the car has reached a checkpoint
-        // TODO: might want to implement so that it only recieves each reward once per
-        // itteration
+        // The car has reached a checkpoint itteration
         else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
                 'p')) {
-            reward = 110;
-        } else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
+            reward = 110;        
+        } 
+        // The car has landed or crossed a wall
+        else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
                 '#')) {
             reward = -1000;
         }
-
+        // The car has crossed the finish line
         else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
                 'F')) {
             return Integer.MAX_VALUE;
@@ -71,6 +80,12 @@ public class Racecar {
         return reward;
     }
 
+    // This method will apply the action selected. the return is the reward.
+    // This method can be called in 2 way depending of the Boolean valueIteration.
+    //If it's null then the car will have 20% probability of not performing the given action
+    //If it's true then the action will be performed(used in value iteration)
+    //If it's false then the action will not be performed(used in value iteration)
+    //The boolean badcrash is used to decide if the car is put back to the start if it hits a wall
     public int apply_action(Action action, char[][] course, Boolean valueIterationMode, Boolean badCrash) {
         Double number = 0.0;
         if (valueIterationMode == null) {
@@ -84,7 +99,7 @@ public class Racecar {
             }
 
         }
-        if (number <= .2) {// non determinism as required
+        if (number <= .2) {// non determinism as required, 20% probability of not accelerating at all
         } else {
             this.state.xSpeed += action.xAcceleration;
             this.state.ySpeed += action.yAcceleration;
@@ -109,14 +124,16 @@ public class Racecar {
                         this.state.yPosition, previousXPostion, previousYPosition, course, '#')) {
             this.state.xSpeed = 0;
             this.state.ySpeed = 0;
+            
 
-            if(badCrash){
+            if (badCrash) {
                 initCarPositon(course);
+            }else{
+                this.state.xPosition = previousXPostion;
+                this.state.yPosition = previousYPosition;
             }
-            this.state.xPosition = previousXPostion;
-            this.state.yPosition = previousYPosition;
-            reward = this.getReward(course, previousXPostion, previousYPosition);
-            // reward -= 1000;
+            //reward = this.getReward(course, previousXPostion, previousYPosition);
+             reward = 1000;
         } else {
             reward = this.getReward(course, previousXPostion, previousYPosition);
         }
@@ -124,6 +141,7 @@ public class Racecar {
         return reward;
     }
 
+    // This function deals only with integers in order to determine if a given character is crossed from the previous position to the current position
     boolean bresenham(int x1, int y1, int x2, int y2, char[][] course, char cross) {
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);

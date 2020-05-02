@@ -1,4 +1,5 @@
-
+/*This class is here to hold all possible state action pairs as object
+*/
 public class StateActionPair {
     CarState state;
     Action action;
@@ -8,7 +9,7 @@ public class StateActionPair {
         this.action=action;
     }
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj) {//to be able to do indexOf
         StateActionPair stateActionPair= (StateActionPair)obj;
         if(this.state.xPosition==stateActionPair.state.xPosition&&
         this.state.yPosition==stateActionPair.state.yPosition && 

@@ -1,0 +1,13 @@
+Benjamin Cathelineau:
+ValueIteration.java
+Racecar.java
+Action.java
+CarState.java
+Main.java
+
+
+Bray Polkinghorne:
+QLearning.java
+ReadFile.java
+Learning.java
+StateActionPair.java
