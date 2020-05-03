@@ -14,7 +14,7 @@ public class Racecar {
 
     public Racecar(char[][] course) {
 
-        this.initCarPositon(course,'S');
+        this.initCarPositon(course, 'S');
         // printCarPosition(course);
     }
 
@@ -58,24 +58,19 @@ public class Racecar {
     public int getReward(char[][] course, int previousXPostion, int previousYPosition, Boolean badCrash) {
         int reward = 0;
         // The car has crossed the finish line
-        if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course, 'F')) {
+        if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
+                'F') == 1) {
             return Integer.MAX_VALUE;
-        }
-        // normal position
-
-        else if (course[this.state.xPosition][this.state.yPosition] == '.') {
-            reward = 100;
         }
         // The car has reached a checkpoint itteration
         else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
-                'p')) {
+                'p') == 1) {
             reward = 110;
         }
-        
 
         // The car has landed or crossed a wall
         else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
-                '#')) {
+                '.') == -1) {
             if (badCrash) {
                 reward = Integer.MIN_VALUE;
             } else {
@@ -127,17 +122,29 @@ public class Racecar {
         this.state.yPosition += this.state.ySpeed;
 
         // check track boundaries or if car crossed a wall
-        int reward;
-        if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course, 'F')) {
-            reward=Integer.MAX_VALUE;
-            initCarPositon(course,'F');
-        } else if (isOutOfBound(this.state.xPosition, this.state.yPosition, course) || bresenham(this.state.xPosition,
-                this.state.yPosition, previousXPostion, previousYPosition, course, '#')) {
+        int reward = 0;
+        int bresenhamResult = 0;
+        int finish_index = bresenham(previousXPostion, previousYPosition,this.state.xPosition, this.state.yPosition,
+                course, 'F');
+        int wall_index = bresenham(previousXPostion, previousYPosition,this.state.xPosition, this.state.yPosition,
+                course, '#');
+        if (finish_index == 999 && wall_index == 999) {
+            bresenhamResult = 0;
+        } else if (finish_index < wall_index) {
+            bresenhamResult = 1;
+        } else if (wall_index < finish_index) {
+            bresenhamResult = -1;
+        }
+
+        if (bresenhamResult == 1) {
+            reward = Integer.MAX_VALUE;
+            initCarPositon(course, 'F');
+        } else if (bresenhamResult == -1) {
             this.state.xSpeed = 0;
             this.state.ySpeed = 0;
 
             if (badCrash) {
-                initCarPositon(course,'S');
+                initCarPositon(course, 'S');
                 reward = Integer.MIN_VALUE;
             } else {
                 this.state.xPosition = previousXPostion;
@@ -146,8 +153,8 @@ public class Racecar {
             }
             // reward = this.getReward(course, previousXPostion, previousYPosition);
 
-        } else {
-            reward = this.getReward(course, previousXPostion, previousYPosition, badCrash);
+        } else if (bresenhamResult == 0) {
+            reward = 100;
         }
 
         return reward;
@@ -155,7 +162,7 @@ public class Racecar {
 
     // This function deals only with integers in order to determine if a given
     // character is crossed from the previous position to the current position
-    Boolean bresenham(int x1, int y1, int x2, int y2, char[][] course, char cross) {
+    int bresenham(int x1, int y1, int x2, int y2, char[][] course, char cross) {
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
         int sx = x1 < x2 ? 1 : -1;
@@ -163,12 +170,16 @@ public class Racecar {
 
         int err = dx - dy;
         int e2;
-
+        int crossIndex = 0;
         while (Boolean.TRUE) {
-            if (!isOutOfBound(x1, y1, course)) {
+            crossIndex++;
+            if (!(isOutOfBound(x1, y1, course))) {
                 if (course[x1][y1] == cross) {
-                    return Boolean.TRUE;
+                    return crossIndex;
                 }
+
+            } else if(!(cross=='F')) {
+                return crossIndex;
             }
 
             if (x1 == x2 && y1 == y2)
@@ -182,8 +193,9 @@ public class Racecar {
                 err = err + dx;
                 y1 = y1 + sy;
             }
+            
         }
-        return false;
+        return 999;
     }
 
     Boolean isOutOfBound(int x, int y, char[][] course) {

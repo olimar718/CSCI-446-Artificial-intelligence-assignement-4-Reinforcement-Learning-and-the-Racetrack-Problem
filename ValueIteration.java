@@ -107,7 +107,9 @@ public class ValueIteration {
     public void raceApplyingPolicy(int[] policy, char course[][], ArrayList<CarState> states, ArrayList<Action> actions,
             Boolean badCrash) {//This is simply to apply the policy that was learned with value iteration.
         Racecar r = new Racecar(course);
+        int numberOfMove=0;
         while (Boolean.TRUE) {
+            numberOfMove++;
             int actionIndex = policy[states.indexOf(r.state)];
             int reward = r.apply_action(actions.get(actionIndex), course, null, badCrash);
 
@@ -116,5 +118,6 @@ public class ValueIteration {
                 break;
             }
         }
+        System.out.println(numberOfMove);
     }
 }
