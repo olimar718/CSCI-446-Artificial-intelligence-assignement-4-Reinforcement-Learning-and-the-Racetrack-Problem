@@ -67,7 +67,7 @@ public class Qlearning {
                 }
             }
             System.out.println(number_of_action);
-            racecar.initCarPositon(course);
+            racecar.initCarPositon(course,'S');
         }
     }
 
