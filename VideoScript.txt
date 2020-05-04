@@ -20,7 +20,7 @@ Each episodes consist of :
 For each episode, the number on screen is the number of action that the car had to take before reaching the finish line
 Then we repeat for 10000 episodes. Finally for the last episode we print the trajectory of the car.
 
-breakpoints : Main 10; Value iteration 13,26,27, 36, 45, 51,52, 56
+breakpoints : Main 10; Value iteration 13,26,27, 36, 45, 51,52, 56, 57
 We now present ValueIteration also with L-TRACK:
 -As before, in main we read the file into a 2d array
 -As before, we enumerate all state, action and state action pair
