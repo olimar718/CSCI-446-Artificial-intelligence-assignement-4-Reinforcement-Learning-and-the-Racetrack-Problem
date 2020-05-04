@@ -1,0 +1,15 @@
+This is project 4 : Reinforcement Learning and the Racetrack Problem, by Benjamin Cathelineau and Bray Polkinghorne
+
+We will first present QLearning, using L-Track:
+-So we start in main where we first use a dedicated class to read the file.
+This simply stores the course in a 2d array of characters.
+We then start our class for QLearning, we pass it the racecar that we just created, the 2d of char that is the course, the discount factor adn the learning rate, and finally, we pass it a boolean indicatin ig the carse will go back to the start in case of a crash
+Now in QLearning, we start by enumerating, using the Learning class, which is the class that contains common code between ValueIteration and QLearning
+-All states
+-All Action
+-And we use those 2 to enumerate all state action pair 
+-We then put the car in a random start position
+After that we start the main loop
+
+We now present ValueIteration also with l-TRACK:
+-As before, in main

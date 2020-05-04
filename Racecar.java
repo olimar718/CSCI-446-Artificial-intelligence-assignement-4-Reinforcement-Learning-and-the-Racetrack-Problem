@@ -53,34 +53,7 @@ public class Racecar {
         }
     }
 
-    // based on the current and previous position of the car, determine the reward
-    // by seeing the position landed on as well as the spaces crosses
-    public int getReward(char[][] course, int previousXPostion, int previousYPosition, Boolean badCrash) {
-        int reward = 0;
-        // The car has crossed the finish line
-        if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
-                'F') == 1) {
-            return Integer.MAX_VALUE;
-        }
-        // The car has reached a checkpoint itteration
-        else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
-                'p') == 1) {
-            reward = 110;
-        }
-
-        // The car has landed or crossed a wall
-        else if (bresenham(this.state.xPosition, this.state.yPosition, previousXPostion, previousYPosition, course,
-                '.') == -1) {
-            if (badCrash) {
-                reward = Integer.MIN_VALUE;
-            } else {
-                reward = -1000;
-            }
-
-        }
-
-        return reward;
-    }
+    
 
     // This method will apply the action selected. the return is the reward.
     // This method can be called in 2 way depending of the Boolean valueIteration.
@@ -90,6 +63,7 @@ public class Racecar {
     // If it's false then the action will not be performed(used in value iteration)
     // The boolean badcrash is used to decide if the car is put back to the start if
     // it hits a wall
+    //This methods also returns the reward
     public int apply_action(Action action, char[][] course, Boolean valueIterationMode, Boolean badCrash) {
         Double number = 0.0;
         if (valueIterationMode == null) {
@@ -121,7 +95,7 @@ public class Racecar {
         this.state.xPosition += this.state.xSpeed;
         this.state.yPosition += this.state.ySpeed;
 
-        // check track boundaries or if car crossed a wall
+        // check track boundaries or if car crossed a wall, and check if car crossed finish line first (before a wall)
         int reward = 0;
         int bresenhamResult = 0;
         int finish_index = bresenham(previousXPostion, previousYPosition,this.state.xPosition, this.state.yPosition,
