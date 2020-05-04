@@ -18,7 +18,7 @@ public class Racecar {
         // printCarPosition(course);
     }
 
-    // Place the car stopped on a random S position
+    // Place the car stopped on a random position according to starting symbol 
     public void initCarPositon(char[][] course, char startingSymbol) {
         ArrayList<Integer> startxposition = new ArrayList<>();
         ArrayList<Integer> startyposition = new ArrayList<>();
