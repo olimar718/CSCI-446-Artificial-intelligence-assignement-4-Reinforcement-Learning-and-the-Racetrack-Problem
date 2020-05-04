@@ -1,5 +1,6 @@
 This is project 4 : Reinforcement Learning and the Racetrack Problem, by Benjamin Cathelineau and Bray Polkinghorne
 
+breakpoints : Main 10; Qlearning 19, 21, 23, 46, 50, 62, 68
 We will first present QLearning, using L-Track:
 -So we start in main where we first use a dedicated class to read the file.
 This simply stores the course in a 2d array of characters.
@@ -13,10 +14,21 @@ Now in QLearning, we start by enumerating, using the Learning class, which is th
 Each episodes consist of :
 -searching the best action in the qtable (based on the score)
 -applying the best action, getting the reward for it, as well as an updated state
+-if the action made us cross the finish line then we stop this episode and go to the next
 -That's where we apply a penalty for the number of action as well
 -then we update the qtable
 For each episode, the number on screen is the number of action that the car had to take before reaching the finish line
 Then we repeat for 10000 episodes. Finally for the last episode we print the trajectory of the car.
 
-We now present ValueIteration also with l-TRACK:
--As before, in main
+breakpoints : Main 10; Value iteration 13,26,27, 36, 45, 51,52, 56
+We now present ValueIteration also with L-TRACK:
+-As before, in main we read the file into a 2d array
+-As before, we enumerate all state, action and state action pair
+-Now we create all necessary data structure, that will hold the constant of Value Iteratoin (reward and state transition)
+-Just after that comes the part where we actually computes those constant. This is what takes the most time in value iteration
+-After this is completed, we actually start value iteration,
+-We first fill in the QTable, as a combinaition of the imediate reward and the discounted future reward
+-We then compute the policy by applying the best action for the current state, according to the qtable that we just filled
+-We copy the value of the qtable that we selected into the value function
+-the last thing we do for the iteration is to check the maximum difference between the current value function and the previous one
+-If it is less than epsilon then we stop here and call race applying policy, which simply use the latest policy that was learned to act until reaching the finish line
