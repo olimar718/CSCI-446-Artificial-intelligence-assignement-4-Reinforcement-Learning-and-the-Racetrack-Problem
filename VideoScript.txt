@@ -9,7 +9,14 @@ Now in QLearning, we start by enumerating, using the Learning class, which is th
 -All Action
 -And we use those 2 to enumerate all state action pair 
 -We then put the car in a random start position
-After that we start the main loop
+-After that we start the episodes, here 10000
+Each episodes consist of :
+-searching the best action in the qtable (based on the score)
+-applying the best action, getting the reward for it, as well as an updated state
+-That's where we apply a penalty for the number of action as well
+-then we update the qtable
+For each episode, the number on screen is the number of action that the car had to take before reaching the finish line
+Then we repeat for 10000 episodes. Finally for the last episode we print the trajectory of the car.
 
 We now present ValueIteration also with l-TRACK:
 -As before, in main
